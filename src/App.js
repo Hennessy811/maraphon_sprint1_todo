@@ -1,57 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { Box, Button, Grid, Container, Divider, Typography } from '@material-ui/core';
+import { useSelector, useDispatch } from 'react-redux';
+import { increment, decrement } from './store/features/counter';
 
 function App() {
+  const dispatch = useDispatch();
+  const state = useSelector(state => state.counter);
+
+  console.log(state);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <Box minHeight="100vh">
+      <Container maxWidth="sm">
+        <Box py={5}>
+          <Typography variant="h1">Todos</Typography>
+          <Divider />
+
+          <Box py={2}>
+            <Typography variant="h3">Counter: {state.value}</Typography>
+          </Box>
+
+          <Box pt={2}>
+            <Grid container spacing={2}>
+              <Grid item>
+                <Button variant="contained" color="primary" onClick={() => dispatch(increment())}>
+                  Add
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="contained" color="primary" onClick={() => dispatch(decrement())}>
+                  Remove
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 
