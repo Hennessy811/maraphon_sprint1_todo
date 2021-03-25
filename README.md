@@ -1,5 +1,12 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
+## API URL - 167.172.176.146
+
+Документация: 167.172.176.146/documentation/v1.0.0#/
+
+В заголовках для всех запросов должен быть заголовок:
+`"accept: application/json"`
+
 ## Available Scripts
 
 In the project directory, you can run:
