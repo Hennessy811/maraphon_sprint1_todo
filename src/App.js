@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Box,
 	Button,
@@ -9,31 +9,47 @@ import {
 	Typography,
 	TextField,
 	List,
-	ListItem
+	ListItem,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useSelector, useDispatch } from 'react-redux';
-import { add, remove } from './store/features/todos';
+import { add, remove, store } from './store/features/todos';
+import axios from 'axios'
 
 function App() {
+	//Request
+	const [data, setData] = useState([])
 
-  //Store
+	useEffect( () => {
+	    (async () => {
+	        const response = await axios.get('http://167.172.176.146/todos')
+			dispatch(store(response.data))
+	        setData(response)
+	    })()
+	}, [])
+
+	//Store
 	const dispatch = useDispatch();
-	const state = useSelector((state) => state.todos);
+	const state = useSelector(state => state.todos);
 
 	//useState
 	const [ items, setItems ] = useState('');
 
-  //Submit
+	//Submit
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		dispatch(add({ items }));
 		setItems('');
 	};
 
-  //Checkbox
-	const handleCheckChange = (event) => {
-		console.log(event.target.id);
+	//Checkbox
+	const handleCheckChange = (e, todo) => {
+		let attr = document.getElementById('checkbox' + e.target.id)
+		if (todo === true) {
+			attr.style.textDecoration = "line-through"
+		} else {
+			attr.style.textDecoration = ""
+		}
 	};
 
 	return (
@@ -62,24 +78,25 @@ function App() {
 								<ListItem key={index}>
 									<Checkbox
 										checked={todo.done}
+										onChange={(e, todo) => handleCheckChange(e, todo)}
 										id={index.toString()}
 										color="primary"
-										inputProps={{ 'aria-label': 'primary checkbox' }}
-										onChange={handleCheckChange}
+										inputProps={{'aria-label': 'primary checkbox'}}
 									/>
 
 									<Grid container>
 										<Typography variant="h5" spacing={5}>
-											<ListItem>
-												{todo}
-											</ListItem>
+											<ListItem
+												id={'checkbox' + index}
+											>	
+												{todo}</ListItem>
 										</Typography>
-										<Button 
-                      variant="contained" 
-                      color="secondary"
-                      value={todo}
-                      onClick={() => dispatch(remove({ todo }))}
-                    >
+										<Button
+											variant="contained"
+											color="secondary"
+											value={todo}
+											onClick={() => dispatch(remove({ todo, index }))}
+										>
 											<DeleteIcon variant="contained" />
 										</Button>
 									</Grid>

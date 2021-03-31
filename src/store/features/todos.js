@@ -1,23 +1,34 @@
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export const counterSlice = createSlice({
   name: 'todos',
   initialState: {
-    value: [ 'Item1', 'Item2', 'Item3' ]
+    value: []
   },
   reducers: {
+
+    //Get api
+    store: (state, items) => {
+      const data = items.payload
+      data.map(item => state.value.push(item.title))
+    },
 
     //Add
     add: (state, items) => {
         const data = items.payload.items
-
         state.value.push(data)
+        axios
+          .post('http://167.172.176.146/todos', {
+            title: data,
+            done: 'false'
+          })
     },
 
     //Remove
     remove:  (state, todo) => {
-
         const data = state.value
+        console.log(data)
         const deleteItem = todo.payload.todo
 
         for (let i = 0; i < data.length; i++) {
@@ -25,12 +36,11 @@ export const counterSlice = createSlice({
                 data.splice(i, 1)
             }
         }
-        console.log(data.forEach(item => console.log(item)))
     }
   },
 });
 
-export const { add, remove } = counterSlice.actions;
+export const { add, remove, store } = counterSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
