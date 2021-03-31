@@ -9,28 +9,28 @@ import {
 	Typography,
 	TextField,
 	List,
-	ListItem,
+	ListItem
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useSelector, useDispatch } from 'react-redux';
 import { add, remove, store } from './store/features/todos';
-import axios from 'axios'
+import axios from 'axios';
 
 function App() {
 	//Request
-	const [data, setData] = useState([])
+	const [ data, setData ] = useState([]);
 
-	useEffect( () => {
-	    (async () => {
-	        const response = await axios.get('http://167.172.176.146/todos')
-			dispatch(store(response.data))
-	        setData(response)
-	    })()
-	}, [])
+	useEffect(() => {
+		(async () => {
+			const response = await axios.get('http://167.172.176.146/todos');
+			dispatch(store(response.data));
+			setData(response);
+		})();
+	}, []);
 
 	//Store
 	const dispatch = useDispatch();
-	const state = useSelector(state => state.todos);
+	const state = useSelector((state) => state.todos);
 
 	//useState
 	const [ items, setItems ] = useState('');
@@ -44,11 +44,11 @@ function App() {
 
 	//Checkbox
 	const handleCheckChange = (e, todo) => {
-		let attr = document.getElementById('checkbox' + e.target.id)
+		let attr = document.getElementById('checkbox' + e.target.id);
 		if (todo === true) {
-			attr.style.textDecoration = "line-through"
+			attr.style.textDecoration = 'line-through';
 		} else {
-			attr.style.textDecoration = ""
+			attr.style.textDecoration = '';
 		}
 	};
 
@@ -81,15 +81,12 @@ function App() {
 										onChange={(e, todo) => handleCheckChange(e, todo)}
 										id={index.toString()}
 										color="primary"
-										inputProps={{'aria-label': 'primary checkbox'}}
+										inputProps={{ 'aria-label': 'primary checkbox' }}
 									/>
 
 									<Grid container>
 										<Typography variant="h5" spacing={5}>
-											<ListItem
-												id={'checkbox' + index}
-											>	
-												{todo}</ListItem>
+											<ListItem id={'checkbox' + index}>{todo}</ListItem>
 										</Typography>
 										<Button
 											variant="contained"
