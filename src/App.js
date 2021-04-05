@@ -1,110 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import {
-	Box,
-	Button,
-	Checkbox,
-	Grid,
-	Container,
-	Divider,
-	Typography,
-	TextField,
-	List,
-	ListItem
-} from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+import { Box, Button, Container, TextField, List, CircularProgress } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
-import { add, remove, store } from './store/features/todos';
-import axios from 'axios';
+import { createItem, deleteItem, fetchTodos, toggleDone } from './store/features/todos';
+import TodosListItem from './shared/components/todosListItem';
 
 function App() {
-	//Request
-	const [ data, setData ] = useState([]);
+  const dispatch = useDispatch();
+  const state = useSelector(state => state.todos);
+  const [title, setTitle] = useState('');
 
-	useEffect(() => {
-		(async () => {
-			const response = await axios.get('http://167.172.176.146/todos');
-			dispatch(store(response.data));
-			setData(response);
-		})();
-	}, []);
+  useEffect(() => {
+    dispatch(fetchTodos());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-	//Store
-	const dispatch = useDispatch();
-	const state = useSelector((state) => state.todos);
+  const handleCreate = () => {
+    const data = {
+      title,
+      done: false,
+    };
+    dispatch(createItem(data));
+    setTitle('');
+  };
 
-	//useState
-	const [ items, setItems ] = useState('');
-
-	//Submit
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		dispatch(add({ items }));
-		setItems('');
-	};
-
-	//Checkbox
-	const handleCheckChange = (e, todo) => {
-		let attr = document.getElementById('checkbox' + e.target.id);
-		if (todo === true) {
-			attr.style.textDecoration = 'line-through';
-		} else {
-			attr.style.textDecoration = '';
-		}
-	};
-
-	return (
-		<Box minHeight="100vh">
-			<Container maxWidth="sm">
-				<Box py={5}>
-					<Typography variant="h1">Todos</Typography>
-					<Divider />
-
-					<form onSubmit={handleSubmit}>
-						<Box pt={2}>
-							<Grid container spacing={2}>
-								<TextField spacing={2} value={items} onInput={(e) => setItems(e.target.value)} />
-								<Grid item>
-									<Button variant="contained" color="primary" type="submit">
-										Add
-									</Button>
-								</Grid>
-							</Grid>
-						</Box>
-					</form>
-
-					<Box py={2}>
-						<List>
-							{state.value.map((todo, index) => (
-								<ListItem key={index}>
-									<Checkbox
-										checked={todo.done}
-										onChange={(e, todo) => handleCheckChange(e, todo)}
-										id={index.toString()}
-										color="primary"
-										inputProps={{ 'aria-label': 'primary checkbox' }}
-									/>
-
-									<Grid container>
-										<Typography variant="h5" spacing={5}>
-											<ListItem id={'checkbox' + index}>{todo}</ListItem>
-										</Typography>
-										<Button
-											variant="contained"
-											color="secondary"
-											value={todo}
-											onClick={() => dispatch(remove({ todo, index }))}
-										>
-											<DeleteIcon variant="contained" />
-										</Button>
-									</Grid>
-								</ListItem>
-							))}
-						</List>
-					</Box>
-				</Box>
-			</Container>
-		</Box>
-	);
+  return (
+    <Box minHeight="100vh">
+      <Container maxWidth="sm">
+        <Box py={10}>
+          {state.data && !state.error ? (
+            <Box>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Create new todo"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  fullWidth
+                />
+                <Box ml={3}>
+                  <Button variant="contained" color="primary" onClick={handleCreate}>
+                    Create
+                  </Button>
+                </Box>
+              </Box>
+              <List>
+                {state.data.map(item => (
+                  <TodosListItem
+                    key={item.key}
+                    done={item.done}
+                    title={item.title}
+                    disabled={state.data && state.isLoading}
+                    onChange={() => dispatch(toggleDone(item.id, !item.done))}
+                    onDelete={() => dispatch(deleteItem(item.id))}
+                  />
+                ))}
+              </List>
+            </Box>
+          ) : (
+            <Box display="flex" width="100%" justify-content="center">
+              <CircularProgress />
+            </Box>
+          )}
+        </Box>
+      </Container>
+    </Box>
+  );
 }
 
 export default App;

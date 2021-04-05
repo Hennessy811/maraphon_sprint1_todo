@@ -1,50 +1,85 @@
 import { createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { request } from '../../shared/utils/request';
+
+// store - где лежат данные
+// actions - события
+// reducers - обработчик
+// selector - вытащить кусок данных из стора
+
+// effects/side-effects - эффекты
+
+// const BASE_URL = 'http://strapi.cskeleto.xyz';
+
+const initialState = {
+  isLoading: false,
+  error: '',
+  data: null,
+};
 
 export const counterSlice = createSlice({
   name: 'todos',
-  initialState: {
-    value: []
-  },
+  initialState,
   reducers: {
-
-    //Get api
-    store: (state, items) => {
-      const data = items.payload
-      data.map(item => state.value.push(item.title))
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
-
-    //Add
-    add: (state, items) => {
-        const data = items.payload.items
-        state.value.push(data)
-        axios
-          .post('http://167.172.176.146/todos', {
-            title: data,
-            done: 'false'
-          })
+    setError: (state, action) => {
+      state.error = action.payload;
     },
-
-    //Remove
-    remove:  (state, todo) => {
-        const data = state.value
-        console.log(data)
-        const deleteItem = todo.payload.todo
-
-        for (let i = 0; i < data.length; i++) {
-            if (data[i] === deleteItem) {
-                data.splice(i, 1)
-            }
-        }
-    }
+    // когда первый раз получаем данные
+    setData: (state, action) => {
+      state.data = action.payload;
+    },
   },
 });
 
-export const { add, remove, store } = counterSlice.actions;
+export const { setError, setData, setLoading } = counterSlice.actions;
 
-// The function below is called a selector and allows us to select a value from
-// the state. Selectors can also be defined inline where they're used instead of
-// in the slice file. For example: `useSelector((state) => state.counter.value)`
-// export const selectCount = state => state.counter.value;
+export const fetchTodos = (skipLoader = false) => dispatch => {
+  if (!skipLoader) {
+    dispatch(setLoading(true));
+  }
+
+  request('/todos')
+    .then(r => {
+      dispatch(setData(r));
+      if (!skipLoader) {
+        dispatch(setLoading(false));
+      }
+    })
+    .catch(err => {
+      dispatch(setError(err.message));
+    });
+};
+
+export const toggleDone = (id, done) => dispatch => {
+  dispatch(setLoading(true));
+
+  request(`/todos/${id}`, 'PUT', { done })
+    .then(() => dispatch(fetchTodos()))
+    .catch(err => {
+      dispatch(setError(err.message));
+    });
+};
+
+export const createItem = data => dispatch => {
+  dispatch(setLoading(true));
+
+  request(`/todos`, 'POST', data)
+    .then(() => dispatch(fetchTodos()))
+    .catch(err => {
+      dispatch(setError(err.message));
+    });
+};
+
+export const deleteItem = id => dispatch => {
+  dispatch(setLoading(true));
+
+  request(`/todos/${id}`, 'DELETE')
+    .then(() => dispatch(fetchTodos()))
+    .catch(err => {
+      dispatch(setError(err.message));
+    });
+};
 
 export default counterSlice.reducer;
