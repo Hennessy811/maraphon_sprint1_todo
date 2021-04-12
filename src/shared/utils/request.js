@@ -51,10 +51,12 @@ export const requestHeaders = (skipToken = false) => {
   headers.append('Content-Type', 'application/json');
   headers.append('Accept', 'application/json');
 
-  // if (!skipToken) {
-  // 	const token = getJwt();
-  // 	headers.append("Authorization", `Bearer ${token}`);
-  // }
+  if (!skipToken) {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      headers.append('Authorization', `Bearer ${token}`);
+    }
+  }
 
   return headers;
 };
