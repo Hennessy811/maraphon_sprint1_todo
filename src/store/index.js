@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from './features/counter';
 import todosReducer from './features/todos'
+import authReducer from './features/auth'
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
-    todos: todosReducer
+    todos: todosReducer,
+    auth: authReducer
   },
 });
