@@ -29,6 +29,7 @@ function Todos() {
 
 	useEffect(() => {
 		request('/users/me').then(setUser);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleCreate = () => {
