@@ -65,7 +65,7 @@ export const toggleDone = (id, done) => dispatch => {
 export const createItem = data => dispatch => {
   dispatch(setLoading(true));
 
-  request(`/todos`, 'POST', data)
+    request(`/todos`, 'POST', data)
     .then(() => dispatch(fetchTodos()))
     .catch(err => {
       dispatch(setError(err.message));
@@ -81,5 +81,15 @@ export const deleteItem = id => dispatch => {
       dispatch(setError(err.message));
     });
 };
+
+export const editItem = (id, title) => dispatch => {
+	dispatch(setLoading(true));
+
+	request(`/todos/${id}`, 'PUT', {title})
+	.then(() => dispatch(fetchTodos()))
+	.catch(err => {
+		dispatch(setError(err.message));
+	  });
+}
 
 export default counterSlice.reducer;
