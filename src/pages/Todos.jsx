@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import {
+	AppBar,
 	Box,
 	Button,
 	Container,
-	Card,
-	CardContent,
 	TextField,
 	Typography,
+	Toolbar,
 	List,
 	CircularProgress
 } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
-import { createItem, deleteItem, fetchTodos, toggleDone, editItem } from '../store/features/todos';
+import { createItem, deleteItem, fetchTodos, toggleDone, editItem, changeItem, addMedia } from '../store/features/todos';
 import TodosListItem from '../shared/components/todosListItem';
 import { request } from '../shared/utils/request';
 import { logout } from '../store/features/auth';
+import { makeStyles } from '@material-ui/core/styles';
 
 function Todos() {
+	const useStyles = makeStyles(() => ({
+		title: {
+			flexGrow: 1
+		}
+	}));
+	const styles = useStyles();
+
 	const dispatch = useDispatch();
 	const state = useSelector((state) => state.todos);
 	const [ title, setTitle ] = useState('');
@@ -51,24 +59,21 @@ function Todos() {
 			<Container maxWidth="sm">
 				<Box display="flex" justifyContent="space-between">
 					{user != null ? (
-						<Card>
-							<CardContent>
-								<Typography color="textSecondary" gutterBottom>
-									<Typography variant="h5" component="h2">
-										{user.username}
-									</Typography>
-									{user.email}
+						<AppBar position="static">
+							<Toolbar>
+								<Typography variant="h6" className={styles.title}>
+									{user.username}
 								</Typography>
-							</CardContent>
-						</Card>
+								<Button variant="contained" color="primary" onClick={handleLogOut}>
+									LogOut
+								</Button>
+							</Toolbar>
+						</AppBar>
 					) : (
 						<Box>
 							<CircularProgress color="secondary" />
 						</Box>
 					)}
-					<Button variant="contained" color="primary" onClick={handleLogOut}>
-						LogOut
-					</Button>
 				</Box>
 
 				<Box py={10}>
@@ -101,10 +106,16 @@ function Todos() {
 										key={item.id}
 										done={item.done}
 										title={item.title}
+										description={item.description}
+										createdAt={item.createdAt}
+										deadlineDate={item.deadlineDate}
+										media={item.media}
 										disabled={state.data && state.isLoading}
 										onChange={() => dispatch(toggleDone(item.id, !item.done))}
 										onDelete={() => dispatch(deleteItem(item.id))}
 										onEdit={(changeTitle) => dispatch(editItem(item.id, changeTitle))}
+										onChangeDescDeadL={(changeDescription, selectDeadLine) => dispatch(changeItem(item.id, changeDescription, selectDeadLine))}
+										onAddMedia={(mediaFile) => dispatch(addMedia(mediaFile))}
 									/>
 								))}
 							</List>

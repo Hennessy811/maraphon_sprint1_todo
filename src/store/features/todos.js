@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { BASE_URL } from '../../shared/config';
 import { request } from '../../shared/utils/request';
 
 // store - где лежат данные
@@ -65,7 +66,7 @@ export const toggleDone = (id, done) => dispatch => {
 export const createItem = data => dispatch => {
   dispatch(setLoading(true));
 
-    request(`/todos`, 'POST', data)
+  request(`/todos`, 'POST', data)
     .then(() => dispatch(fetchTodos()))
     .catch(err => {
       dispatch(setError(err.message));
@@ -89,7 +90,34 @@ export const editItem = (id, title) => dispatch => {
 	.then(() => dispatch(fetchTodos()))
 	.catch(err => {
 		dispatch(setError(err.message));
-	  });
+	});
+}
+
+export const changeItem = (id, description, deadlineDate) => dispatch => {
+  dispatch(setLoading(true))
+
+  request(`/todos/${id}`, 'PUT', {description, deadlineDate})
+  .then(() => dispatch(fetchTodos()))
+  .catch(err => {
+    dispatch(setError(err.message))
+  })
+}
+
+export const addMedia = data => dispatch => {
+  dispatch(setLoading(true));
+
+  const fd = new FormData()
+
+  fd.append('files', data[0])
+
+  fetch(`${BASE_URL}/upload`, {
+    method: 'POST',
+    body: fd
+  })
+  .then(() => dispatch(fetchTodos()))
+  .catch(err => {
+    dispatch(setError(err.message))
+  })
 }
 
 export default counterSlice.reducer;
